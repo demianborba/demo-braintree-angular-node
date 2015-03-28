@@ -400,7 +400,7 @@ angular.module('DropinApp', ['ngMaterial'])
     $scope.getToken();
 
   }]);
-  ``
+  ```
 
 #### 3.2 Setting up a client app using v.zero's Custom Integration
 - The code for `customintegration.html` is:
