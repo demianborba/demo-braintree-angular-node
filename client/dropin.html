@@ -1,0 +1,57 @@
+<!DOCTYPE html>
+<html lang="en" ng-app="DropinApp">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, user-scalable=no, initial-scale=1.0, maximum-scale=1.0, minimum-scale=1.0">
+  <title>Demo BH - Dropin</title>
+  <link rel="stylesheet" href="bower_components/angular-material/angular-material.min.css">
+  <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=RobotoDraft:400,500,700,400italic">
+  <link rel="stylesheet" href="styles.css">
+</head>
+
+<body layout="column" layout-align="top center" ng-controller="DropinController">
+
+  <md-toolbar>
+    <div class="md-toolbar-tools">
+      <span class="md-flex">Battle Hack Demo : Dropin Sample</span>
+    </div>
+  </md-toolbar>
+
+  <md-content class="md-padding">
+
+    <md-whiteframe class="md-whiteframe-z1" layout="column" layout-align="center center" ng-class="{error: isError, success: isPaid}">
+
+      <span><p ng-bind="message"></p></span>
+
+      <div class="dropin-container" ng-show="showDropinContainer">
+
+        <form name="payment">
+          <md-input-container>
+            <label>Amount (XX.XX)</label>
+            <input type="number" ng-model="amount"/>
+          </md-input-container>
+
+          <!-- Add Dropin here -->
+          <div id="checkout"></div>
+
+          <md-button class="md-raised md-primary" type="submit">Pay Now</md-button>
+        </form>
+      </div>
+
+    </md-whiteframe>
+
+  </md-content>
+
+  <!-- Braintree Web -->
+  <script src="bower_components/braintree-web/dist/braintree.js"></script>
+  <!-- Angular Material Dependencies -->
+  <script src="bower_components/angular/angular.min.js"></script>
+  <script src="bower_components/angular-animate/angular-animate.min.js"></script>
+  <script src="bower_components/angular-aria/angular-aria.min.js"></script>
+  <script src="bower_components/angular-material/angular-material.min.js"></script>
+  <!-- Project-specific Angular code -->
+  <script src="dropin.js"></script>
+</body>
+
+</html>

@@ -1,0 +1,45 @@
+<!DOCTYPE html>
+<html lang="en" ng-app="IndexApp">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, user-scalable=no, initial-scale=1.0, maximum-scale=1.0, minimum-scale=1.0">
+  <title>Demo BH</title>
+  <link rel="stylesheet" href="bower_components/angular-material/angular-material.min.css">
+  <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=RobotoDraft:400,500,700,400italic">
+  <link rel="stylesheet" href="styles.css">
+</head>
+<body layout="column" layout-align="top center" ng-controller="IndexController">
+
+  <md-toolbar>
+    <div class="md-toolbar-tools">
+      <span class="md-flex">Battle Hack Demo</span>
+    </div>
+  </md-toolbar>
+
+  <md-content>
+    <md-list>
+      <md-item ng-repeat="sample in samples">
+        <md-item-content ng-click="openPage(sample.link)">
+          <div class="md-tile-left">
+            <img ng-src="{{sample.icon}}" alt="{{sample.title}}">
+          </div>
+          <div class="md-tile-content">
+            <h3><strong>{{sample.title}}</strong></h3>
+            <h4>{{sample.description}}</h4>
+            <p>Tap to view this sample.</p>
+          </div>
+        </md-item-content>
+        <md-divider></md-divider>
+      </md-item>
+    </md-list>
+  </md-content>
+
+  <!-- Angular Material Dependencies -->
+  <script src="bower_components/angular/angular.min.js"></script>
+  <script src="bower_components/angular-animate/angular-animate.min.js"></script>
+  <script src="bower_components/angular-aria/angular-aria.min.js"></script>
+  <script src="bower_components/angular-material/angular-material.min.js"></script>
+  <!-- Project-specific Angular code -->
+  <script src="index.js"></script>
+</body>
+</html>

@@ -1,0 +1,12 @@
+md-content {   height: 100%; }
+md-item-content { cursor: pointer; }
+img { padding: 15px; height: 100px; }
+md-content { height: 100%; }
+md-whiteframe { padding: 5px 20px; }
+.dropin-container { width: 100%; }
+form { width: 100%; padding: 0 10px 35px 10px; }
+.md-button { margin: 30px 0 0 0; width: 100%; padding: 15px; }
+md-input-container { width: 100%; }
+md-progress-linear { padding: 10px; }
+.error { background: #e03b3b; color: #fff; }
+.success { background: #2db441; color: #fff; }

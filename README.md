@@ -1,7 +1,5 @@
-# demo-bh-la-braintree-node-angular
+# demo-braintree-angular-node
 Transaction sale with Angular Material (server in Node, client with Angular using dropin and custom integration)
-
-## Making money with Angular apps (30 minute workshop)
 
 ### 1. Setup a Braintree Sandbox Account
 - Visit [https://www.braintreepayments.com/v.zero](https://www.braintreepayments.com/v.zero)
@@ -20,12 +18,14 @@ Transaction sale with Angular Material (server in Node, client with Angular usin
 
 Sample credentials in Node:
 
-        var gateway = braintree.connect({
-            environment:  braintree.Environment.Sandbox,
-            merchantId:   'ffdqc9fyffn7yn2j',
-            publicKey:    'qj65nndbnn6qyjkp',
-            privateKey:   'a3de3bb7dddf68ed3c33f4eb6d9579ca'
-        });
+```javascript
+var gateway = braintree.connect({
+    environment:  braintree.Environment.Sandbox,
+ merchantId:   'ffdqc9fyffn7yn2j',
+    publicKey:    'qj65nndbnn6qyjkp',
+    privateKey:   'a3de3bb7dddf68ed3c33f4eb6d9579ca'
+});
+```
 
 ### Before moving forward
 - Make sure you have **Node** installed, if not download+install: [nodejs.org/download](http://nodejs.org/download) *(we need Node.js to write and run our server)*
