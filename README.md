@@ -21,7 +21,7 @@ Sample credentials in Node:
 ```javascript
 var gateway = braintree.connect({
     environment:  braintree.Environment.Sandbox,
- merchantId:   'ffdqc9fyffn7yn2j',
+    merchantId:   'ffdqc9fyffn7yn2j',
     publicKey:    'qj65nndbnn6qyjkp',
     privateKey:   'a3de3bb7dddf68ed3c33f4eb6d9579ca'
 });
@@ -46,6 +46,7 @@ var gateway = braintree.connect({
   "description": "A server to process a sale transaction with Braintree",
   "main": "app.js",
   "scripts": {
+    "start": "node app",
     "test": "echo \"Error: no test specified\" && exit 1"
   },
   "author": "Demian Borba (dborba@paypal.com)",
@@ -79,10 +80,10 @@ var jsonParser = bodyParser.json();
  * Instantiate your gateway (update here with your Braintree API Keys)
  */
 var gateway = braintree.connect({
-    environment:  braintree.Environment.Sandbox,
-    merchantId:   '6dr2nwjy8f56mqyt',
-    publicKey:    'yxhwjftm8t34rcmg',
-    privateKey:   '21fa3101d6721f02312a2503985db88c'
+  environment:  braintree.Environment.Sandbox,
+  merchantId:   '6dr2nwjy8f56mqyt',
+  publicKey:    'yxhwjftm8t34rcmg',
+  privateKey:   '21fa3101d6721f02312a2503985db88c'
 });
 
 /**
@@ -113,7 +114,7 @@ app.post('/api/v1/token', function (request, response) {
 app.post('/api/v1/process', jsonParser, function (request, response) {
   var transaction = request.body;
   gateway.transaction.sale({
-    amount: '100',
+    amount: transaction.amount,
     paymentMethodNonce: transaction.payment_method_nonce
   }, function (err, result) {
     if (err) throw err;
@@ -121,11 +122,11 @@ app.post('/api/v1/process', jsonParser, function (request, response) {
     response.json(result);
   });
 });
-```
 
 app.listen(3000, function () {
   console.log('Listening on port 3000');
 });
+```
 
 - Start your server with `node app`
 - Make a test request to check if token in being returned, by opening a new terminal window and typing `curl -X POST http://localhost:3000/api/v1/token`
@@ -136,391 +137,410 @@ app.listen(3000, function () {
 - For this project we will need to install some UI packages using *Bower*, do it with: `bower install angular angular-material braintree-web --save`
 - Your *bower.json* will look similar to:
 
-        {
-          "name": "client",
-          "version": "1.0.0",
-          "authors": [
-            "Demian Borba <demian.borba@actioncreations.com>"
-          ],
-          "description": "A client to request a sale transaction with Braintree",
-          "main": "index.html",
-          "license": "Apache",
-          "ignore": [
-            "**/.*",
-            "node_modules",
-            "bower_components",
-            "test",
-            "tests"
-          ],
-          "dependencies": {
-            "angular": "~1.3.14",
-            "angular-material": "~0.8.1",
-            "braintree-web": "~2.5.1"
-          }
-        }
+```javascript
+{
+  "name": "client",
+  "version": "1.0.0",
+  "authors": [
+    "Demian Borba <demian.borba@actioncreations.com>"
+  ],
+  "description": "A client to request a sale transaction with Braintree",
+  "main": "index.html",
+  "license": "Apache",
+  "ignore": [
+    "**/.*",
+    "node_modules",
+    "bower_components",
+    "test",
+    "tests"
+  ],
+  "dependencies": {
+    "angular": "~1.3.14",
+    "angular-material": "~0.8.1",
+    "angular-animate": "~1.3.5",
+    "angular-aria": "~1.3.5",
+    "hammerjs": "~2.0.4",
+    "braintree-web": "~2.5.1"
+  }
+}
+```
 
 - In your page, create 3 html files: `index.html`, `dropin.html` and `customintegration.html`
 - Open `index.html` and write a simple page to have links to `dropin.html` and `customintegration.html`:
 
-        <!DOCTYPE html>
-        <html lang="en" ng-app="IndexApp">
-        <head>
-          <meta charset="UTF-8">
-          <meta name="viewport" content="width=device-width, user-scalable=no, initial-scale=1.0, maximum-scale=1.0, minimum-scale=1.0">
-          <title>Demo BH</title>
-          <link rel="stylesheet" href="bower_components/angular-material/angular-        material.min.css">
-          <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=RobotoDraft:400,500,700,400italic">
-          <link rel="stylesheet" href="styles.css">
-        </head>
-        <body layout="column" layout-align="top center" ng-controller="IndexController">
+```html
+<!DOCTYPE html>
+<html lang="en" ng-app="IndexApp">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, user-scalable=no, initial-scale=1.0, maximum-scale=1.0, minimum-scale=1.0">
+  <title>Braintree with Angular and Node</title>
+  <link rel="stylesheet" href="bower_components/angular-material/angular-material.min.css">
+  <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=RobotoDraft:400,500,700,400italic">
+  <link rel="stylesheet" href="styles.css">
+</head>
+<body layout="column" layout-align="top center" ng-controller="IndexController">
 
-          <md-toolbar>
-            <div class="md-toolbar-tools">
-              <span class="md-flex">Battle Hack Demo</span>
-            </div>
-          </md-toolbar>
+  <md-toolbar>
+    <div class="md-toolbar-tools">
+      <span class="md-flex">Braintree Samples with Angular and Node</span>
+    </div>
+  </md-toolbar>
 
-          <md-content>
-            <md-list>
-              <md-item ng-repeat="sample in samples">
-                <md-item-content ng-click="openPage(sample.link)">
-                  <div class="md-tile-left">
-                    <img ng-src="{{sample.icon}}" alt="{{sample.title}}">
-                  </div>
-                  <div class="md-tile-content">
-                    <h3><strong>{{sample.title}}</strong></h3>
-                    <h4>{{sample.description}}</h4>
-                    <p>Tap to view this sample.</p>
-                  </div>
-                </md-item-content>
-                <md-divider></md-divider>
-              </md-item>
-            </md-list>
-          </md-content>
+  <md-content>
+    <md-list>
+      <md-item ng-repeat="sample in samples">
+        <md-item-content ng-click="openPage(sample.link)">
+          <div class="md-tile-left">
+            <img ng-src="{{sample.icon}}" alt="{{sample.title}}">
+          </div>
+          <div class="md-tile-content">
+            <h3><strong>{{sample.title}}</strong></h3>
+            <h4>{{sample.description}}</h4>
+            <p>Tap to view this sample.</p>
+          </div>
+        </md-item-content>
+        <md-divider></md-divider>
+      </md-item>
+    </md-list>
+  </md-content>
 
-          <!-- Angular Material Dependencies -->
-          <script src="bower_components/angular/angular.min.js"></script>
-          <script src="bower_components/angular-animate/angular-animate.min.js"></script>
-          <script src="bower_components/angular-aria/angular-aria.min.js"></script>
-          <script src="bower_components/angular-material/angular-material.min.js"></script>
-          <!-- Project-specific Angular code -->
-          <script src="index.js"></script>
-        </body>
-        </html>
+  <!-- Angular Material Dependencies -->
+  <script src="bower_components/angular/angular.min.js"></script>
+  <script src="bower_components/angular-animate/angular-animate.min.js"></script>
+  <script src="bower_components/angular-aria/angular-aria.min.js"></script>
+  <script src="bower_components/angular-material/angular-material.min.js"></script>
+  <!-- Project-specific Angular code -->
+  <script src="index.js"></script>
+</body>
+</html>
+```
 
 - Then write the Angular code for your `index.html` page in a file called `index.js`:
 
-        angular.module('IndexApp', ['ngMaterial'])
-          .config(function ($mdThemingProvider) {
-            $mdThemingProvider.theme('default')
-              .primaryPalette('blue-grey');
-          })
-          .controller('IndexController', ['$scope', function ($scope) {
-            $scope.samples = [
-              {
-                icon: 'dropin.png',
-                title: 'Dropin Sample',
-                description: 'A client to request a sale transaction with Braintree using Dropin',
-                link: 'dropin.html'
-              },
-              {
-                icon: 'customintegration.png',
-                title: 'Custom Integration Sample',
-                description: 'A client to request a sale transaction with Braintree using Custom Integration',
-                link: 'customintegration.html'
-              }
-            ];
-            $scope.openPage = function (page) {
-              window.location.href = page;
-            };
-          }]);
+```javascript
+angular.module('IndexApp', ['ngMaterial'])
+  .config(function ($mdThemingProvider) {
+    $mdThemingProvider.theme('default')
+      .primaryPalette('blue-grey');
+  })
+  .controller('IndexController', ['$scope', function ($scope) {
+    $scope.samples = [
+      {
+        icon: 'dropin.png',
+        title: 'Dropin Sample',
+        description: 'A client to request a sale transaction with Braintree using Dropin',
+        link: 'dropin.html'
+      },
+      {
+        icon: 'customintegration.png',
+        title: 'Custom Integration Sample',
+        description: 'A client to request a sale transaction with Braintree using Custom Integration',
+        link: 'customintegration.html'
+      }
+    ];
+    $scope.openPage = function (page) {
+      window.location.href = page;
+    };
+  }]);
+  ```
 
 - To make things prettier, create a file called `styles.css` with some css:
 
-        md-content {   height: 100%; }
-        md-item-content { cursor: pointer; }
-        img { padding: 15px; height: 100px; }
-        md-content { height: 100%; }
-        md-whiteframe { padding: 5px 20px; }
-        .dropin-container { width: 100%; }
-        form { width: 100%; padding: 0 10px 35px 10px; }
-        .md-button { margin: 30px 0 0 0; width: 100%; padding: 15px; }
-        md-input-container { width: 100%; }
-        md-progress-linear { padding: 10px; }
-        .error { background: #e03b3b; color: #fff; }
-        .success { background: #2db441; color: #fff; }
+```css
+md-content {   height: 100%; }
+md-item-content { cursor: pointer; }
+img { padding: 15px; height: 100px; }
+md-content { height: 100%; }
+md-whiteframe { padding: 5px 20px; }
+.dropin-container { width: 100%; }
+form { width: 100%; padding: 0 10px 35px 10px; }
+.md-button { margin: 30px 0 0 0; width: 100%; padding: 15px; }
+md-input-container { width: 100%; }
+md-progress-linear { padding: 10px; }
+.error { background: #e03b3b; color: #fff; }
+.success { background: #2db441; color: #fff; }
+```
 
 #### 3.1 Setting up a client app using v.zero's Dropin
 - The code for `dropin.html` is:
 
-        <!DOCTYPE html>
-        <html lang="en" ng-app="DropinApp">
+```html
+<!DOCTYPE html>
+<html lang="en" ng-app="DropinApp">
 
-        <head>
-          <meta charset="UTF-8">
-          <meta name="viewport" content="width=device-width, user-scalable=no, initial-scale=1.0, maximum-scale=1.0, minimum-scale=1.0">
-          <title>Demo BH - Dropin</title>
-          <link rel="stylesheet" href="bower_components/angular-material/angular-material.min.css">
-          <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=RobotoDraft:400,500,700,400italic">
-          <link rel="stylesheet" href="styles.css">
-        </head>
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, user-scalable=no, initial-scale=1.0, maximum-scale=1.0, minimum-scale=1.0">
+  <title>Braintree Sample with Dropin</title>
+  <link rel="stylesheet" href="bower_components/angular-material/angular-material.min.css">
+  <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=RobotoDraft:400,500,700,400italic">
+  <link rel="stylesheet" href="styles.css">
+</head>
 
-        <body layout="column" layout-align="top center" ng-controller="DropinController">
+<body layout="column" layout-align="top center" ng-controller="DropinController">
 
-          <md-toolbar>
-            <div class="md-toolbar-tools">
-              <span class="md-flex">Battle Hack Demo : Dropin Sample</span>
-            </div>
-          </md-toolbar>
+  <md-toolbar>
+    <div class="md-toolbar-tools">
+      <span class="md-flex">Braintree Sample with Dropin</span>
+    </div>
+  </md-toolbar>
 
-          <md-content class="md-padding">
+  <md-content class="md-padding">
 
-            <md-whiteframe class="md-whiteframe-z1" layout="column" layout-align="center center" ng-class="{error: isError, success: isPaid}">
+    <md-whiteframe class="md-whiteframe-z1" layout="column" layout-align="center center" ng-class="{error: isError, success: isPaid}">
 
-              <span><p ng-bind="message"></p></span>
+      <span><p ng-bind="message"></p></span>
 
-              <div class="dropin-container" ng-show="showDropinContainer">
+      <div class="dropin-container" ng-show="showDropinContainer">
 
-                <form name="payment">
-                  <md-input-container>
-                    <label>Amount (XX.XX)</label>
-                    <input type="number" ng-model="amount"/>
-                  </md-input-container>
+        <form name="payment">
+          <md-input-container>
+            <label>Amount (XX.XX)</label>
+            <input type="number" ng-model="amount"/>
+          </md-input-container>
 
-                  <!-- Add Dropin here -->
-                  <div id="checkout"></div>
+          <!-- Add Dropin here -->
+          <div id="checkout"></div>
 
-                  <md-button class="md-raised md-primary" type="submit">Pay Now</md-button>
-                </form>
-              </div>
+          <md-button class="md-raised md-primary" type="submit">Pay Now</md-button>
+        </form>
+      </div>
 
-            </md-whiteframe>
+    </md-whiteframe>
 
-          </md-content>
+  </md-content>
 
-          <!-- Braintree Web -->
-          <script src="bower_components/braintree-web/dist/braintree.js"></script>
-          <!-- Angular Material Dependencies -->
-          <script src="bower_components/angular/angular.min.js"></script>
-          <script src="bower_components/angular-animate/angular-animate.min.js"></script>
-          <script src="bower_components/angular-aria/angular-aria.min.js"></script>
-          <script src="bower_components/angular-material/angular-material.min.js"></script>
-          <!-- Project-specific Angular code -->
-          <script src="dropin.js"></script>
-        </body>
+  <!-- Braintree Web -->
+  <script src="bower_components/braintree-web/dist/braintree.js"></script>
+  <!-- Angular Material Dependencies -->
+  <script src="bower_components/angular/angular.min.js"></script>
+  <script src="bower_components/angular-animate/angular-animate.min.js"></script>
+  <script src="bower_components/angular-aria/angular-aria.min.js"></script>
+  <script src="bower_components/angular-material/angular-material.min.js"></script>
+  <!-- Project-specific Angular code -->
+  <script src="dropin.js"></script>
+</body>
 
-        </html>
+</html>
+```
 
 - The code for `dropin.js` is:
 
-        angular.module('DropinApp', ['ngMaterial'])
-          .config(function ($mdThemingProvider) {
-            $mdThemingProvider.theme('default')
-              .primaryPalette('blue-grey');
-          })
-          .controller('DropinController', ['$scope', '$http', function ($scope, $http) {
+```javascript
+angular.module('DropinApp', ['ngMaterial'])
+  .config(function ($mdThemingProvider) {
+    $mdThemingProvider.theme('default')
+      .primaryPalette('blue-grey');
+  })
+  .controller('DropinController', ['$scope', '$http', function ($scope, $http) {
 
-            $scope.message = 'Please use the form below to pay:';
-            $scope.showDropinContainer = true;
-            $scope.isError = false;
-            $scope.isPaid = false;
+    $scope.message = 'Please use the form below to pay:';
+    $scope.showDropinContainer = true;
+    $scope.isError = false;
+    $scope.isPaid = false;
 
-            $scope.getToken = function () {
+    $scope.getToken = function () {
 
-              $http({
-                method: 'POST',
-                url: 'http://localhost:3000/api/v1/token'
-              }).success(function (data) {
+      $http({
+        method: 'POST',
+        url: 'http://localhost:3000/api/v1/token'
+      }).success(function (data) {
 
-                console.log(data.client_token);
+        console.log(data.client_token);
 
-                braintree.setup(data.client_token, 'dropin', {
-                  container: 'checkout',
-                  // Form is not submitted by default when paymentMethodNonceReceived is implemented
-                  paymentMethodNonceReceived: function (event, nonce) {
+        braintree.setup(data.client_token, 'dropin', {
+          container: 'checkout',
+          // Form is not submitted by default when paymentMethodNonceReceived is implemented
+          paymentMethodNonceReceived: function (event, nonce) {
 
-                    $scope.message = 'Processing your payment...';
-                    $scope.showDropinContainer = false;
+            $scope.message = 'Processing your payment...';
+            $scope.showDropinContainer = false;
 
-                    $http({
-                      method: 'POST',
-                      url: 'http://localhost:3000/api/v1/process',
-                      data: {
-                        amount: $scope.amount,
-                        payment_method_nonce: nonce
-                      }
-                    }).success(function (data) {
+            $http({
+              method: 'POST',
+              url: 'http://localhost:3000/api/v1/process',
+              data: {
+                amount: $scope.amount,
+                payment_method_nonce: nonce
+              }
+            }).success(function (data) {
 
-                      console.log(data.success);
+              console.log(data.success);
 
-                      if (data.success) {
-                        $scope.message = 'Payment authorized, thanks.';
-                        $scope.showDropinContainer = false;
-                        $scope.isError = false;
-                        $scope.isPaid = true;
-
-                      } else {
-                        // implement your solution to handle payment failures
-                        $scope.message = 'Payment failed: ' + data.message + ' Please refresh the page and try again.';
-                        $scope.isError = true;
-                      }
-
-                    }).error(function (error) {
-                      $scope.message = 'Error: cannot connect to server. Please make sure your server is running.';
-                      $scope.showDropinContainer = false;
-                      $scope.isError = true;
-                    });
-
-                  }
-                });
-
-              }).error(function (error) {
-                $scope.message = 'Error: cannot connect to server. Please make sure your server is running.';
+              if (data.success) {
+                $scope.message = 'Payment authorized, thanks.';
                 $scope.showDropinContainer = false;
+                $scope.isError = false;
+                $scope.isPaid = true;
+
+              } else {
+                // implement your solution to handle payment failures
+                $scope.message = 'Payment failed: ' + data.message + ' Please refresh the page and try again.';
                 $scope.isError = true;
-              });
+              }
 
-            };
+            }).error(function (error) {
+              $scope.message = 'Error: cannot connect to server. Please make sure your server is running.';
+              $scope.showDropinContainer = false;
+              $scope.isError = true;
+            });
 
-            $scope.getToken();
+          }
+        });
 
-          }]);
+      }).error(function (error) {
+        $scope.message = 'Error: cannot connect to server. Please make sure your server is running.';
+        $scope.showDropinContainer = false;
+        $scope.isError = true;
+      });
+
+    };
+
+    $scope.getToken();
+
+  }]);
+  ``
 
 #### 3.2 Setting up a client app using v.zero's Custom Integration
 - The code for `customintegration.html` is:
 
-        <!DOCTYPE html>
-        <html lang="en" ng-app="CustomIntegrationApp">
+```html
+<!DOCTYPE html>
+<html lang="en" ng-app="CustomIntegrationApp">
 
-        <head>
-          <meta charset="UTF-8">
-          <meta name="viewport" content="width=device-width, user-scalable=no, initial-scale=1.0, maximum-scale=1.0, minimum-scale=1.0">
-          <title>Demo BH - Dropin</title>
-          <link rel="stylesheet" href="bower_components/angular-material/angular-material.min.css">
-          <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=RobotoDraft:400,500,700,400italic">
-          <link rel="stylesheet" href="styles.css">
-        </head>
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, user-scalable=no, initial-scale=1.0, maximum-scale=1.0, minimum-scale=1.0">
+  <title>Braintree Sample with Custom Integration</title>
+  <link rel="stylesheet" href="bower_components/angular-material/angular-material.min.css">
+  <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=RobotoDraft:400,500,700,400italic">
+  <link rel="stylesheet" href="styles.css">
+</head>
 
-        <body layout="column" layout-align="top center" ng-controller="CustomIntegrationController">
+<body layout="column" layout-align="top center" ng-controller="CustomIntegrationController">
 
-          <md-toolbar>
-            <div class="md-toolbar-tools">
-              <span class="md-flex">Battle Hack Demo : Custom Integration Sample</span>
-            </div>
-          </md-toolbar>
+  <md-toolbar>
+    <div class="md-toolbar-tools">
+      <span class="md-flex">Braintree Sample with Custom Integration</span>
+    </div>
+  </md-toolbar>
 
-          <md-content class="md-padding">
+  <md-content class="md-padding">
 
-            <!-- Custom integration here -->
+    <!-- Custom integration here -->
 
-            <md-whiteframe class="md-whiteframe-z1" layout="column" layout-align="center center" ng-class="{error: isError, success: isPaid}">
+    <md-whiteframe class="md-whiteframe-z1" layout="column" layout-align="center center" ng-class="{error: isError, success: isPaid}">
 
-              <span><p ng-bind="message"></p></span>
+      <span><p ng-bind="message"></p></span>
 
-              <form name="payment" ng-submit="processPayment()" ng-show="showForm">
-                <md-input-container>
-                  <label>Amount (X.XX)</label>
-                  <input type="number" ng-model="amount"/>
-                </md-input-container>
-                <md-input-container>
-                  <label>Credit Card Number (XXXX XXXX XXXX XXXX)</label>
-                  <input type="number" ng-model="creditCardNumber"/>
-                </md-input-container>
-                <md-input-container>
-                  <label>Expiration Date (MM/YY)</label>
-                  <input type="text" ng-model="expirationDate"/>
-                </md-input-container>
-                <md-button class="md-raised md-primary" type="submit">Pay Now</md-button>
-              </form>
+      <form name="payment" ng-submit="processPayment()" ng-show="showForm">
+        <md-input-container>
+          <label>Amount (X.XX)</label>
+          <input type="number" ng-model="amount"/>
+        </md-input-container>
+        <md-input-container>
+          <label>Credit Card Number (XXXX XXXX XXXX XXXX)</label>
+          <input type="number" ng-model="creditCardNumber"/>
+        </md-input-container>
+        <md-input-container>
+          <label>Expiration Date (MM/YY)</label>
+          <input type="text" ng-model="expirationDate"/>
+        </md-input-container>
+        <md-button class="md-raised md-primary" type="submit">Pay Now</md-button>
+      </form>
 
-            </md-whiteframe>
+    </md-whiteframe>
 
-          </md-content>
+  </md-content>
 
-          <!-- Braintree Web -->
-          <script src="bower_components/braintree-web/dist/braintree.js"></script>
-          <!-- Angular Material Dependencies -->
-          <script src="bower_components/angular/angular.min.js"></script>
-          <script src="bower_components/angular-animate/angular-animate.min.js"></script>
-          <script src="bower_components/angular-aria/angular-aria.min.js"></script>
-          <script src="bower_components/angular-material/angular-material.min.js"></script>
-          <!-- Project-specific Angular code -->
-          <script src="customintegration.js"></script>
-        </body>
+  <!-- Braintree Web -->
+  <script src="bower_components/braintree-web/dist/braintree.js"></script>
+  <!-- Angular Material Dependencies -->
+  <script src="bower_components/angular/angular.min.js"></script>
+  <script src="bower_components/angular-animate/angular-animate.min.js"></script>
+  <script src="bower_components/angular-aria/angular-aria.min.js"></script>
+  <script src="bower_components/angular-material/angular-material.min.js"></script>
+  <!-- Project-specific Angular code -->
+  <script src="customintegration.js"></script>
+</body>
 
-        </html>
+</html>
+```
 
-- The code for `customintegration.js` is
+- The code for `customintegration.js` is:
 
-        angular.module('CustomIntegrationApp', ['ngMaterial'])
-          .config(function ($mdThemingProvider) {
-            $mdThemingProvider.theme('default')
-              .primaryPalette('blue-grey');
-          })
-          .controller('CustomIntegrationController', ['$scope', '$http', function ($scope, $http) {
+```javascript
+angular.module('CustomIntegrationApp', ['ngMaterial'])
+  .config(function ($mdThemingProvider) {
+    $mdThemingProvider.theme('default')
+      .primaryPalette('blue-grey');
+  })
+  .controller('CustomIntegrationController', ['$scope', '$http', function ($scope, $http) {
 
-            $scope.message = 'Please use the form below to pay:';
+    $scope.message = 'Please use the form below to pay:';
 
-            $scope.message = 'Please use the form below to pay:';
-            $scope.isError = false;
-            $scope.isPaid = false;
-            $scope.showForm = true;
+    $scope.message = 'Please use the form below to pay:';
+    $scope.isError = false;
+    $scope.isPaid = false;
+    $scope.showForm = true;
 
-            $scope.processPayment = function () {
+    $scope.processPayment = function () {
 
-              $scope.message = 'Processing payment...';
-              $scope.showForm = false;
+      $scope.message = 'Processing payment...';
+      $scope.showForm = false;
 
-              // send request to get token, then use the token to tokenize credit card info and process a transaction
-              $http({
-                method: 'POST',
-                url: 'http://localhost:3000/api/v1/token'
-              }).success(function (data) {
+      // send request to get token, then use the token to tokenize credit card info and process a transaction
+      $http({
+        method: 'POST',
+        url: 'http://localhost:3000/api/v1/token'
+      }).success(function (data) {
 
-                // create new client and tokenize card
-                var client = new braintree.api.Client({clientToken: data.client_token});
-                client.tokenizeCard({
-                  number: $scope.creditCardNumber,
-                  expirationDate: $scope.expirationDate
-                }, function (err, nonce) {
+        // create new client and tokenize card
+        var client = new braintree.api.Client({clientToken: data.client_token});
+        client.tokenizeCard({
+          number: $scope.creditCardNumber,
+          expirationDate: $scope.expirationDate
+        }, function (err, nonce) {
 
-                  $http({
-                    method: 'POST',
-                    url: 'http://localhost:3000/api/v1/process',
-                    data: {
-                      amount: $scope.amount,
-                      payment_method_nonce: nonce
-                    }
-                  }).success(function (data) {
+          $http({
+            method: 'POST',
+            url: 'http://localhost:3000/api/v1/process',
+            data: {
+              amount: $scope.amount,
+              payment_method_nonce: nonce
+            }
+          }).success(function (data) {
 
-                    console.log(data.success);
-                    $scope.showForm = false;
+            console.log(data.success);
+            $scope.showForm = false;
 
-                    if (data.success) {
-                      $scope.message = 'Payment authorized, thanks.';
-                      $scope.isError = false;
-                      $scope.isPaid = true;
+            if (data.success) {
+              $scope.message = 'Payment authorized, thanks.';
+              $scope.isError = false;
+              $scope.isPaid = true;
 
-                    } else {
-                      // implement your solution to handle payment failures
-                      $scope.message = 'Payment failed: ' + data.message + ' Please refresh the page and try again.';
-                      $scope.isError = true;
-                    }
+            } else {
+              // implement your solution to handle payment failures
+              $scope.message = 'Payment failed: ' + data.message + ' Please refresh the page and try again.';
+              $scope.isError = true;
+            }
 
-                  }).error(function (error) {
-                    $scope.message = 'Error: cannot connect to server. Please make sure your server is running.';
-                    $scope.isError = true;
-                    $scope.showForm = false;
-                  });
+          }).error(function (error) {
+            $scope.message = 'Error: cannot connect to server. Please make sure your server is running.';
+            $scope.isError = true;
+            $scope.showForm = false;
+          });
 
-                });
+        });
 
-              }).error(function (error) {
-                $scope.message = 'Error: cannot connect to server. Please make sure your server is running.';
-                $scope.isError = true;
-                $scope.showForm = false;
-              });
+      }).error(function (error) {
+        $scope.message = 'Error: cannot connect to server. Please make sure your server is running.';
+        $scope.isError = true;
+        $scope.showForm = false;
+      });
 
-            };
+    };
 
-          }]);# demo-braintree-angular-node
+  }]);
+  ```
