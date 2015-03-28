@@ -39,23 +39,25 @@ var gateway = braintree.connect({
 - For this project we will need to install some packages using *npm*, do it with: `npm install body-parser braintree express util --save`
 - Your *package.json* will look similar to:
 
-        {
-          "name": "server",
-          "version": "1.0.0",
-          "description": "A server to process a sale transaction with Braintree",
-          "main": "app.js",
-          "scripts": {
-            "test": "echo \"Error: no test specified\" && exit 1"
-          },
-          "author": "Demian Borba (dborba@paypal.com)",
-          "license": "Apache",
-          "dependencies": {
-            "body-parser": "^1.12.0",
-            "braintree": "^1.23.0",
-            "express": "^4.12.0",
-            "util": "^0.10.3"
-          }
-        }
+```javascript
+{
+  "name": "server",
+  "version": "1.0.0",
+  "description": "A server to process a sale transaction with Braintree",
+  "main": "app.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "author": "Demian Borba (dborba@paypal.com)",
+  "license": "Apache",
+  "dependencies": {
+    "body-parser": "^1.12.0",
+    "braintree": "^1.23.0",
+    "express": "^4.12.0",
+    "util": "^0.10.3"
+  }
+}
+```
 
 - Create a file named `app.js` and write the code for your server:
 
